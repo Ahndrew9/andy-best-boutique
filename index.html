@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andy Best Boutique| Style & Comfort</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="announcement-bar">
+        <p>✨ Free delivery on orders over ₦50,000 | Shop the new collection today!</p>
+    </div>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Andy<span>Best</span></a>
+            <nav class="nav-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="shop.html">Shop</a>
+            </nav>
+            <div class="nav-actions">
+                <a href="shop.html" class="nav-search-icon" title="Search"><i class="fa-solid fa-magnifying-glass"></i></a>
+                <button class="icon-btn cart-btn" id="cartToggle" title="View Cart">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-subtitle">New Season Arrival</span>
+            <h1>Elevate Your Everyday Wardrobe</h1>
+            <p>Discover hand-picked comfort and style—from premium denim to effortless everyday essentials designed for you.</p>
+            <div class="hero-buttons">
+                <a href="shop.html" class="btn btn-primary">Shop Now<i class="fa-solid fa-arrow-right"></i></a>
+                <a href="shop.html?category=joggers" class="btn btn-outline">View latest collection</a>
+            </div>
+        </div>
+        <div class="hero-image-wrapper">
+            <img src="image/IMG_2603.JPG" alt="Fashion Collection">
+        </div>
+    </section>
+
+    <section class="categories-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Shop by Category</h2>
+                <p>Find exactly what you're looking for</p>
+            </div>
+            
+            <div class="category-grid">
+                <a href="shop.html?category=jeans" class="category-card">
+                    <img src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=500&q=80" alt="Jeans">
+                    <div class="category-overlay">
+                        <h3>Jeans</h3>
+                        <span>Shop Now</span>
+                    </div>
+                </a>
+                <a href="shop.html?category=tshirts" class="category-card">
+                    <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=500&q=80" alt="T-Shirts">
+                    <div class="category-overlay">
+                        <h3>Round Necks & Tees</h3>
+                        <span>Shop Now</span>
+                    </div>
+                </a>
+                <a href="shop.html?category=joggers" class="category-card">
+                    <img src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=500&q=80" alt="Joggers">
+                    <div class="category-overlay">
+                        <h3>Joggers & Shorts</h3>
+                        <span>Shop Now</span>
+                    </div>
+                </a>
+                <a href="shop.html?category=shoes" class="category-card">
+                    <img src="https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=500&q=80" alt="Shoes">
+                    <div class="category-overlay">
+                        <h3>Shoes & Slides</h3>
+                        <span>Shop Now</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-col">
+                <h3>Andy<span>Best</span></h3>
+                <p>Making quality clothing accessible, comfortable, and stylish for everyone.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <a href="shop.html">All Products</a>
+                <a href="shop.html?category=jeans">Jeans</a>
+                <a href="shop.html?category=shoes">Footwear</a>
+            </div>
+            <div class="footer-col">
+                <h4>Customer Care</h4>
+                <p>Have questions about sizing or orders? Reach out to us directly on WhatsApp!</p>
+                <a href="https://wa.me/2348072352450" target="_blank" class="whatsapp-footer-btn"><i class="fa-brands fa-whatsapp"></i> Chat with Us</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Andy Best Boutique. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h3>Your Shopping Bag</h3>
+            <button class="close-cart" id="closeCart"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div class="cart-items" id="cartItemsContainer">
+            <p class="empty-cart-msg">Your bag is currently empty.</p>
+        </div>
+
+        <div class="cart-footer" id="cartFooter" style="display: none;">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotalPrice">₦0</span>
+            </div>
+            <button class="whatsapp-checkout-btn" id="whatsappCheckoutBtn">
+                <i class="fa-brands fa-whatsapp"></i> Checkout via WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('andy_best_boutique_cart')) || [];
+
+        const cartToggle = document.getElementById('cartToggle');
+        const cartDrawer = document.getElementById('cartDrawer');
+        const cartOverlay = document.getElementById('cartOverlay');
+        const closeCart = document.getElementById('closeCart');
+        const cartItemsContainer = document.getElementById('cartItemsContainer');
+        const cartFooter = document.getElementById('cartFooter');
+        const cartTotalPrice = document.getElementById('cartTotalPrice');
+        const cartCount = document.getElementById('cartCount');
+        const whatsappCheckoutBtn = document.getElementById('whatsappCheckoutBtn');
+
+        cartToggle.addEventListener('click', () => { cartDrawer.classList.add('active'); cartOverlay.classList.add('active'); updateCartUI(); });
+        function closeCartDrawer() { cartDrawer.classList.remove('active'); cartOverlay.classList.remove('active'); }
+        closeCart.addEventListener('click', closeCartDrawer);
+        cartOverlay.addEventListener('click', closeCartDrawer);
+
+        function formatPrice(price) { return '₦' + Number(price).toLocaleString(); }
+        function saveCart() { localStorage.setItem('andy_best_boutique_cart', JSON.stringify(cart)); }
+
+        function changeQuantity(index, amount) {
+            cart[index].quantity += amount;
+            if (cart[index].quantity <= 0) { cart.splice(index, 1); }
+            saveCart();
+            updateCartUI();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            saveCart();
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            cartItemsContainer.innerHTML = '';
+            let totalItems = 0;
+            let totalPrice = 0;
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `<p class="empty-cart-msg">Your bag is currently empty.</p>`;
+                cartFooter.style.display = 'none';
+                cartCount.innerText = '0';
+                return;
+            }
+
+            cartFooter.style.display = 'block';
+
+            cart.forEach((item, index) => {
+                totalItems += item.quantity;
+                totalPrice += item.price * item.quantity;
+
+                const itemEl = document.createElement('div');
+                itemEl.className = 'cart-item-card';
+                itemEl.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="cart-item-img">
+                    <div class="cart-item-details">
+                        <h4>${item.name}</h4>
+                        <p class="cart-item-price">${formatPrice(item.price)}</p>
+                        <div class="cart-quantity-controls">
+                            <button onclick="changeQuantity(${index}, -1)"><i class="fa-solid fa-minus"></i></button>
+                            <span>${item.quantity}</span>
+                            <button onclick="changeQuantity(${index}, 1)"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <button class="remove-item-btn" onclick="removeFromCart(${index})" title="Remove"><i class="fa-solid fa-trash-can"></i></button>
+                `;
+                cartItemsContainer.appendChild(itemEl);
+            });
+
+            cartCount.innerText = totalItems;
+            cartTotalPrice.innerText = formatPrice(totalPrice);
+        }
+
+        whatsappCheckoutBtn.addEventListener('click', async () => {
+            if (cart.length === 0) return;
+            const orderNumber = 'VV-' + Math.floor(1000 + Math.random() * 9000);
+            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            try {
+                await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderNumber, items: cart, total: subtotal, status: 'Pending' })
+                });
+            } catch (err) {
+                console.error("Could not log order to admin backend", err);
+            }
+
+            let message = `Hello! I want to place an order.%0A*Order Number:* ${orderNumber}%0A%0A*Order Items:*%0A`;
+            cart.forEach(item => {
+                message += `- ${item.name} (${item.quantity}x) - ${formatPrice(item.price * item.quantity)}%0A`;
+            });
+            message += `%0A*Total Amount:* ${formatPrice(subtotal)}%0APlease confirm my order!`;
+
+            const momWhatsAppNumber = "2348072352450";
+            window.open(`https://wa.me/${momWhatsAppNumber}?text=${message}`, '_blank');
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            let totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.innerText = totalItems;
+        });
+    </script>
+</body>
+</html>

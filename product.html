@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | Vogue Vault</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .pdp-container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .pdp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: start; }
+        .pdp-img-box { background: var(--bg-light); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); height: 450px; }
+        .pdp-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .pdp-details h1 { font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+        .pdp-price { font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 20px; }
+        .pdp-category { display: inline-block; background: var(--bg-light); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 15px; }
+        .pdp-description { font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 25px; }
+        
+        .variant-section { margin-bottom: 25px; }
+        .variant-section label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px; }
+        .size-options { display: flex; gap: 10px; }
+        .size-btn { border: 1px solid var(--border-color); background: var(--white); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .size-btn.active { border-color: var(--primary); background: var(--primary); color: var(--white); }
+
+        .trust-box { border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 20px 0; margin: 25px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .trust-item { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
+        .trust-item i { color: var(--primary); font-size: 18px; }
+
+        .reviews-section { margin-top: 60px; }
+        .reviews-section h3 { font-size: 22px; margin-bottom: 20px; }
+        .review-card { background: var(--bg-light); padding: 15px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color); }
+        .review-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; font-weight: 600; }
+        .stars { color: #f59e0b; }
+
+        .similar-section { margin-top: 60px; }
+        .similar-section h3 { font-size: 22px; margin-bottom: 20px; }
+        @media(max-width: 768px) { .pdp-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">Andy<span>Best</span></a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="shop.html">Shop</a>
+            </nav>
+            <div class="nav-actions">
+                <button class="icon-btn cart-btn" id="cartToggle" title="View Cart">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="pdp-container">
+        <div class="pdp-grid" id="productDetailContainer"></div>
+
+        <div class="reviews-section">
+            <h3>Customer Reviews</h3>
+            <div id="reviewsContainer"></div>
+        </div>
+
+        <div class="similar-section">
+            <h3>You Might Also Like</h3>
+            <div class="product-grid" id="similarGrid"></div>
+        </div>
+    </div>
+
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-drawer" id="cartDrawer">
+        <div class="cart-header">
+            <h3>Your Shopping Bag</h3>
+            <button class="close-cart" id="closeCart"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="cart-items" id="cartItemsContainer">
+            <p class="empty-cart-msg">Your bag is currently empty.</p>
+        </div>
+        <div class="cart-footer" id="cartFooter" style="display: none;">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotalPrice">₦0</span>
+            </div>
+            <button class="whatsapp-checkout-btn" id="whatsappCheckoutBtn">
+                <i class="fa-brands fa-whatsapp"></i> Checkout via WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let selectedSize = 'M';
+        let cart = JSON.parse(localStorage.getItem('andy_best_boutique_cart')) || [];
+
+        const cartToggle = document.getElementById('cartToggle');
+        const cartDrawer = document.getElementById('cartDrawer');
+        const cartOverlay = document.getElementById('cartOverlay');
+        const closeCart = document.getElementById('closeCart');
+        const cartItemsContainer = document.getElementById('cartItemsContainer');
+        const cartFooter = document.getElementById('cartFooter');
+        const cartTotalPrice = document.getElementById('cartTotalPrice');
+        const cartCount = document.getElementById('cartCount');
+        const whatsappCheckoutBtn = document.getElementById('whatsappCheckoutBtn');
+
+        cartToggle.addEventListener('click', () => { cartDrawer.classList.add('active'); cartOverlay.classList.add('active'); });
+        function closeCartDrawer() { cartDrawer.classList.remove('active'); cartOverlay.classList.remove('active'); }
+        closeCart.addEventListener('click', closeCartDrawer);
+        cartOverlay.addEventListener('click', closeCartDrawer);
+
+        function formatPrice(price) { return '₦' + price.toLocaleString(); }
+        function saveCart() { localStorage.setItem('andy_best_boutique_cart', JSON.stringify(cart)); }
+
+        const reviewPools = {
+            shoes: [
+                { name: "Emeka K.", text: "Super comfortable sole. Good grip and easy to slip on for daily outings.", stars: 5 },
+                { name: "Tunde B.", text: "Clean finish and looks just like the pictures. Worth every Naira.", stars: 4 }
+            ],
+            slides: [
+                { name: "Zainab A.", text: "Very soft and lightweight. Perfect for indoor and casual outdoor wear.", stars: 5 },
+                { name: "Femi O.", text: "Durable material and true to size. Fast WhatsApp delivery too!", stars: 5 }
+            ],
+            default: [
+                { name: "Adebayo M.", text: "Top tier fabric quality! Fits true to size and feels very comfortable.", stars: 5 },
+                { name: "Chidinma O.", text: "Loved the material and color accuracy. Exactly as shown in the picture.", stars: 4 }
+            ]
+        };
+
+        async function fetchProductDetails() {
+            const params = new URLSearchParams(window.location.search);
+            const productId = parseInt(params.get('id')) || 1;
+
+            try {
+                const res = await fetch('/api/products');
+                const products = await res.json();
+                const product = products.find(p => p.id === productId) || products[0];
+
+                const productDescription = product.description || "Crafted with high-end premium fabrics to guarantee absolute comfort, durability, and a clean streetwear aesthetic.";
+
+                const detailContainer = document.getElementById('productDetailContainer');
+                detailContainer.innerHTML = `
+                    <div class="pdp-img-box">
+                        <img src="${product.image}" alt="${product.name}">
+                    </div>
+                    <div class="pdp-details">
+                        <span class="pdp-category">${product.category.toUpperCase()}</span>
+                        <h1>${product.name}</h1>
+                        <div class="pdp-price">${formatPrice(product.price)}</div>
+                        <p class="pdp-description">${productDescription}</p>
+                        
+                        <div class="variant-section">
+                            <label>Select Size:</label>
+                            <div class="size-options">
+                                <button class="size-btn" onclick="selectSize(this, 'S')">S</button>
+                                <button class="size-btn active" onclick="selectSize(this, 'M')">M</button>
+                                <button class="size-btn" onclick="selectSize(this, 'L')">L</button>
+                                <button class="size-btn" onclick="selectSize(this, 'XL')">XL</button>
+                            </div>
+                        </div>
+
+                        <button class="btn-primary" style="width: 100%; justify-content: center; padding: 14px;" onclick="addCurrentToCart('${product.name}', ${product.price}, '${product.image}')">
+                            <i class="fa-solid fa-bag-shopping"></i> Add to Bag
+                        </button>
+
+                        <div class="trust-box">
+                            <div class="trust-item"><i class="fa-solid fa-truck-fast"></i> Fast Nationwide Delivery</div>
+                            <div class="trust-item"><i class="fa-solid fa-shield-halved"></i> Verified Quality Guaranteed</div>
+                        </div>
+                    </div>
+                `;
+
+                const reviewsContainer = document.getElementById('reviewsContainer');
+                reviewsContainer.innerHTML = '';
+                const categoryReviews = reviewPools[product.category] || reviewPools.default;
+                
+                categoryReviews.forEach(rev => {
+                    let starIcons = '<i class="fa-solid fa-star"></i>'.repeat(rev.stars);
+                    const card = document.createElement('div');
+                    card.className = 'review-card';
+                    card.innerHTML = `
+                        <div class="review-header">
+                            <span>${rev.name}</span>
+                            <span class="stars">${starIcons}</span>
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-muted);">${rev.text}</p>
+                    `;
+                    reviewsContainer.appendChild(card);
+                });
+
+                const similarGrid = document.getElementById('similarGrid');
+                similarGrid.innerHTML = '';
+                const similar = products.filter(p => p.id !== product.id).slice(0, 4);
+                
+                similar.forEach(sim => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <div class="product-img-wrap" onclick="window.location.href='product.html?id=${sim.id}'" style="cursor: pointer;">
+                            <img src="${sim.image}" alt="${sim.name}">
+                        </div>
+                        <div class="product-info">
+                            <span class="product-cat">${sim.category.toUpperCase()}</span>
+                            <h3 onclick="window.location.href='product.html?id=${sim.id}'" style="cursor: pointer;">${sim.name}</h3>
+                            <div class="product-footer">
+                                <span class="product-price">${formatPrice(sim.price)}</span>
+                                <button class="add-to-cart-btn" onclick="addToCart('${sim.name}', ${sim.price}, '${sim.image}')">
+                                    <i class="fa-solid fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    similarGrid.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error("Failed to load product details", err);
+            }
+        }
+
+        function selectSize(btn, size) {
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedSize = size;
+        }
+
+        function addCurrentToCart(name, price, image) {
+            const fullName = `${name} (${selectedSize})`;
+            const existing = cart.find(item => item.name === fullName);
+            if (existing) { existing.quantity += 1; } else { cart.push({ name: fullName, price, image, quantity: 1 }); }
+            saveCart();
+            updateCartUI();
+            cartDrawer.classList.add('active');
+            cartOverlay.classList.add('active');
+        }
+
+        function addToCart(name, price, image) {
+            const existing = cart.find(item => item.name === name);
+            if (existing) { existing.quantity += 1; } else { cart.push({ name, price, image, quantity: 1 }); }
+            saveCart();
+            updateCartUI();
+            cartDrawer.classList.add('active');
+            cartOverlay.classList.add('active');
+        }
+
+        function changeQuantity(index, amount) {
+            cart[index].quantity += amount;
+            if (cart[index].quantity <= 0) { cart.splice(index, 1); }
+            saveCart();
+            updateCartUI();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            saveCart();
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            cartItemsContainer.innerHTML = '';
+            let totalItems = 0;
+            let totalPrice = 0;
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `<p class="empty-cart-msg">Your bag is currently empty.</p>`;
+                cartFooter.style.display = 'none';
+                cartCount.innerText = '0';
+                return;
+            }
+
+            cartFooter.style.display = 'block';
+
+            cart.forEach((item, index) => {
+                totalItems += item.quantity;
+                totalPrice += item.price * item.quantity;
+
+                const itemEl = document.createElement('div');
+                itemEl.className = 'cart-item-card';
+                itemEl.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="cart-item-img">
+                    <div class="cart-item-details">
+                        <h4>${item.name}</h4>
+                        <p class="cart-item-price">${formatPrice(item.price)}</p>
+                        <div class="cart-quantity-controls">
+                            <button onclick="changeQuantity(${index}, -1)"><i class="fa-solid fa-minus"></i></button>
+                            <span>${item.quantity}</span>
+                            <button onclick="changeQuantity(${index}, 1)"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <button class="remove-item-btn" onclick="removeFromCart(${index})" title="Remove"><i class="fa-solid fa-trash-can"></i></button>
+                `;
+                cartItemsContainer.appendChild(itemEl);
+            });
+
+            cartCount.innerText = totalItems;
+            cartTotalPrice.innerText = formatPrice(totalPrice);
+        }
+
+        whatsappCheckoutBtn.addEventListener('click', async () => {
+            if (cart.length === 0) return;
+            const orderNumber = 'VV-' + Math.floor(1000 + Math.random() * 9000);
+            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            try {
+                await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderNumber, items: cart, total: subtotal, status: 'Pending' })
+                });
+            } catch (err) {
+                console.error("Could not log order to admin backend", err);
+            }
+
+            let message = `Hello! I want to place an order.%0A*Order Number:* ${orderNumber}%0A%0A*Order Items:*%0A`;
+            cart.forEach(item => {
+                message += `- ${item.name} (${item.quantity}x) - ${formatPrice(item.price * item.quantity)}%0A`;
+            });
+            message += `%0A*Total Amount:* ${formatPrice(subtotal)}%0APlease confirm my order!`;
+
+            const momWhatsAppNumber = "2348072352450";
+            window.open(`https://wa.me/${momWhatsAppNumber}?text=${message}`, '_blank');
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchProductDetails();
+            updateCartUI();
+        });
+    </script>
+</body>
+</html>

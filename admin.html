@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Andy Best Boutique</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .admin-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .admin-card { background: var(--white); border: 1px solid var(--border-color); border-radius: 10px; padding: 25px; }
+        .admin-card h2 { font-size: 20px; margin-bottom: 20px; font-weight: 700; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit; font-size: 14px; outline: none; }
+        .form-group textarea { resize: vertical; height: 80px; }
+        .form-group input[type="file"] { padding: 8px; background: var(--bg-light); cursor: pointer; }
+        .order-list, .inventory-list { display: flex; flex-direction: column; gap: 12px; max-height: 450px; overflow-y: auto; }
+        .order-item-box { background: var(--bg-light); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); position: relative; }
+        .order-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .order-item-box h4 { font-size: 14px; font-weight: 700; color: var(--primary); }
+        .status-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; }
+        .status-pending { background: #fef3c7; color: #b45309; }
+        .status-processing { background: #e0f2fe; color: #0369a1; }
+        .status-completed { background: #dcfce7; color: #15803d; }
+        .order-actions { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+        .status-btn { background: var(--white); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
+        .status-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .inv-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+        .inv-info { display: flex; align-items: center; gap: 12px; }
+        .inv-info img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; }
+        .inv-info h5 { font-size: 13px; font-weight: 600; }
+        .delete-btn { background: #ff4d4d; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        
+        /* Login Overlay */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: var(--white); width: 100%; max-width: 400px; padding: 35px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; }
+        .login-box h2 { margin-bottom: 8px; font-size: 24px; }
+        .login-box p { color: var(--text-muted); font-size: 14px; margin-bottom: 25px; }
+        .logout-btn { background: #ff4d4d; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; }
+        @media(max-width: 900px) { .admin-sections { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <!-- Admin Login Screen (Hidden if logged in) -->
+    <div id="loginOverlay">
+        <div class="login-box">
+            <h2>Admin Portal</h2>
+            <p>Enter your password to access the inventory dashboard.</p>
+            <form id="loginForm">
+                <div class="form-group" style="text-align: left;">
+                    <label>Password</label>
+                    <input type="password" id="adminPassword" required placeholder="Enter admin password">
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">Login to Dashboard</button>
+                <p id="loginError" style="color: #ff4d4d; font-size: 12px; margin-top: 12px; display: none;"></p>
+            </form>
+        </div>
+    </div>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="shop.html" class="logo">Andy<span>Best Admin</span></a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="shop.html">View Storefront</a>
+            </nav>
+            <button class="logout-btn" onclick="logoutAdmin()">Logout</button>
+        </div>
+    </header>
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Store Management Dashboard</h1>
+        </div>
+
+        <div class="admin-sections">
+            <div>
+                <div class="admin-card" style="margin-bottom: 30px;">
+                    <h2>Add New Product</h2>
+                    <form id="addProductForm">
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" id="prodName" required placeholder="e.g. Classic Denim Jacket">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="prodCategory" required>
+                                <option value="jeans">Jeans</option>
+                                <option value="roundneck">Round Neck</option>
+                                <option value="tshirts">T-Shirts</option>
+                                <option value="shorts">Shorts</option>
+                                <option value="joggers">Joggers</option>
+                                <option value="shoes">Shoes</option>
+                                <option value="slides">Slides</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Price (₦)</label>
+                            <input type="number" id="prodPrice" required placeholder="15000">
+                        </div>
+                        <div class="form-group">
+                            <label>Product Description</label>
+                            <textarea id="prodDescription" required placeholder="Describe fabric quality, fit, and style details..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Product Image File</label>
+                            <input type="file" id="prodImageFile" accept="image/*" required>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 12px;">Add Product to Store</button>
+                    </form>
+                </div>
+
+                <div class="admin-card">
+                    <h2>Current Inventory</h2>
+                    <div class="inventory-list" id="inventoryList"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="admin-card">
+                    <h2>Incoming WhatsApp Orders</h2>
+                    <div class="order-list" id="orderList">
+                        <p class="empty-cart-msg">No orders recorded yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check session storage for admin login state on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const isAuthed = sessionStorage.getItem('andy_best_boutique_admin_auth');
+            if (isAuthed === 'true') {
+                document.getElementById('loginOverlay').style.display = 'none';
+                loadAdminData();
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('adminPassword').value;
+            const errorEl = document.getElementById('loginError');
+
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    sessionStorage.setItem('andy_best_boutique_admin_auth', 'true');
+                    document.getElementById('loginOverlay').style.display = 'none';
+                    loadAdminData();
+                } else {
+                    errorEl.innerText = data.message || 'Incorrect password';
+                    errorEl.style.display = 'block';
+                }
+            } catch (err) {
+                console.error("Login error:", err);
+                errorEl.innerText = 'Server error during login';
+                errorEl.style.display = 'block';
+            }
+        });
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('andy_best_boutique_admin_auth');
+            location.reload();
+        }
+
+        async function loadAdminData() {
+            try {
+                const prodRes = await fetch('/api/products');
+                const products = await prodRes.json();
+                const invList = document.getElementById('inventoryList');
+                invList.innerHTML = '';
+                
+                products.forEach(p => {
+                    const row = document.createElement('div');
+                    row.className = 'inv-row';
+                    const safePrice = (typeof p.price === 'number') ? p.price : Number(p.price) || 0;
+                    row.innerHTML = `
+                        <div class="inv-info">
+                            <img src="${p.image}" alt="${p.name}">
+                            <div>
+                                <h5>${p.name}</h5>
+                                <p style="font-size:11px; color:#666;">₦${safePrice.toLocaleString()} (${p.category.toUpperCase()})</p>
+                            </div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteProduct(${p.id})"><i class="fa-solid fa-trash"></i></button>
+                    `;
+                    invList.appendChild(row);
+                });
+
+                const ordRes = await fetch('/api/orders');
+                const orders = await ordRes.json();
+                const ordList = document.getElementById('orderList');
+                ordList.innerHTML = '';
+                
+                if (orders.length === 0) {
+                    ordList.innerHTML = `<p class="empty-cart-msg">No orders recorded yet.</p>`;
+                    return;
+                }
+                
+                orders.forEach(o => {
+                    const box = document.createElement('div');
+                    box.className = 'order-item-box';
+                    let itemsHtml = o.items.map(i => `<p style="font-size:13px; color:#555;">• ${i.name} (${i.quantity}x) - ₦${(i.price * i.quantity).toLocaleString()}</p>`).join('');
+                    
+                    const statusClass = o.status === 'Processing' ? 'status-processing' : o.status === 'Completed' ? 'status-completed' : 'status-pending';
+
+                    box.innerHTML = `
+                        <div class="order-top">
+                            <h4>Order #${o.orderNumber}</h4>
+                            <span class="status-badge ${statusClass}">${o.status || 'Pending'}</span>
+                        </div>
+                        <p style="font-size:12px; color:#777; margin-bottom:4px;">${o.date}</p>
+                        <div style="margin: 8px 0; background: white; padding: 8px; border-radius: 6px;">${itemsHtml}</div>
+                        <p style="font-size:13px; font-weight:700; margin-bottom:8px;">Total: ₦${o.total.toLocaleString()}</p>
+                        <div class="order-actions">
+                            <span style="font-size:11px; font-weight:600; color:#666;">Update:</span>
+                            <button class="status-btn" onclick="updateOrderStatus(${o.id}, 'Pending')">Pending</button>
+                            <button class="status-btn" onclick="updateOrderStatus(${o.id}, 'Processing')">Processing</button>
+                            <button class="status-btn" onclick="updateOrderStatus(${o.id}, 'Completed')">Completed</button>
+                            <button class="delete-btn" style="margin-left:auto;" onclick="deleteOrder(${o.id})" title="Delete Order"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                    ordList.appendChild(box);
+                });
+            } catch (err) {
+                console.error("Error loading admin data:", err);
+            }
+        }
+
+        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('name', document.getElementById('prodName').value);
+            formData.append('category', document.getElementById('prodCategory').value);
+            formData.append('price', document.getElementById('prodPrice').value);
+            formData.append('description', document.getElementById('prodDescription').value);
+            formData.append('prodImage', document.getElementById('prodImageFile').files[0]);
+
+            try {
+                const res = await fetch('/api/products', { method: 'POST', body: formData });
+                if (res.ok) {
+                    alert('Product added successfully!');
+                    document.getElementById('addProductForm').reset();
+                    loadAdminData();
+                } else {
+                    alert('Failed to add product.');
+                }
+            } catch (err) {
+                console.error("Error uploading product:", err);
+            }
+        });
+
+        async function deleteProduct(id) {
+            if (confirm('Delete this product?')) {
+                await fetch(`/api/products/${id}`, { method: 'DELETE' });
+                loadAdminData();
+            }
+        }
+
+        async function updateOrderStatus(orderId, newStatus) {
+            await fetch(`/api/orders/${orderId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+            loadAdminData();
+        }
+
+        async function deleteOrder(orderId) {
+            if (confirm('Delete this order record?')) {
+                await fetch(`/api/orders/${orderId}`, { method: 'DELETE' });
+                loadAdminData();
+            }
+        }
+    </script>
+</body>
+</html>

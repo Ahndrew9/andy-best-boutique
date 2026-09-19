@@ -1,0 +1,16 @@
+{
+  "name": "vogue-vault",
+  "version": "1.0.0",
+  "description": "E-commerce store with WhatsApp checkout and admin dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cloudinary": "^2.11.0",
+    "express": "^4.19.2",
+    "multer": "^2.4.0",
+    "pg": "^8.23.0",
+    "sqlite3": "^6.0.1"
+  }
+}
