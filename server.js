@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname)));
 
 // ==========================================
-// 1. CLOUDINARY CONFIGURATION (INPUT YOUR KEYS)
+// 1. CLOUDINARY CONFIGURATION
 // ==========================================
 cloudinary.config({
     cloud_name: 'djz9ghgqg',
@@ -21,9 +21,6 @@ cloudinary.config({
     api_secret: 'KxFXynhbLZI0HTQjzAHMbuxwQCg'
 });
 
-// ==========================================
-// 2. SUPABASE CONNECTION PARAMETERS (INPUT YOUR DETAILS)
-// ==========================================
 // ==========================================
 // 2. SUPABASE CONNECTION STRING
 // ==========================================
@@ -92,6 +89,17 @@ async function initCloudDB() {
 }
 
 initCloudDB();
+
+// ==========================================
+// 3. PAGE ROUTES
+// ==========================================
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+// ==========================================
+// 4. API ENDPOINTS
+// ==========================================
 
 // Admin Login
 app.post('/api/admin/login', (req, res) => {
